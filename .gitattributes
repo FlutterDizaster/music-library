@@ -1,0 +1,31 @@
+# Universal line ending normalization
+* text=auto eol=lf
+
+# Explicit settings for Go source code
+*.go text eol=lf
+
+# Settings for configuration files
+*.mod text eol=lf         # Go modules
+*.sum text eol=lf         # Checksum files
+*.yaml text eol=lf        # YAML configurations
+*.yml text eol=lf
+*.json text eol=lf        # JSON files
+*.toml text eol=lf        # TOML files
+*.env text eol=lf         # Environment files
+*.sql text eol=lf         # SQL scripts
+
+# Settings for scripts and Makefile
+*.sh text eol=lf          # Shell scripts
+Makefile text eol=lf
+
+# Exclude binary files from normalization
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.svg -text
+*.exe -text
+*.dll -text
+*.so -text
+*.zip -text
+*.tar.gz -text
