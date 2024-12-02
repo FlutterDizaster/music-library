@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags="-s -w" -o go-app cmd/main.go
+RUN go build -ldflags="-s -w" -o mlibrary cmd/main.go
 
 # Deploy stage
 FROM alpine:latest
@@ -18,8 +18,8 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-COPY --from=builder /app/go-app .
+COPY --from=builder /app/mlibrary .
 
-RUN chmod +x /app/go-app
+RUN chmod +x /app/mlibrary
 
-CMD ["./go-app"]
+CMD ["./mlibrary"]

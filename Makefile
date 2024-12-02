@@ -1,4 +1,4 @@
-BINARY_NAME=go-app
+BINARY_NAME=mlibrary
 BINARY_PATH=./build
 
 CMD_DIR=./cmd
