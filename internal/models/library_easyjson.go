@@ -141,10 +141,10 @@ func easyjsonFf3e8803DecodeGithubComFlutterDizasterMusicLibraryInternalModels1(i
 			continue
 		}
 		switch key {
-		case "page":
-			out.Page = int(in.Int())
-		case "pageSize":
-			out.PageSize = int(in.Int())
+		case "limit":
+			out.Limit = int(in.Int())
+		case "offset":
+			out.Offset = int(in.Int())
 		case "total":
 			out.Total = int(in.Int())
 		default:
@@ -162,14 +162,14 @@ func easyjsonFf3e8803EncodeGithubComFlutterDizasterMusicLibraryInternalModels1(o
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"page\":"
+		const prefix string = ",\"limit\":"
 		out.RawString(prefix[1:])
-		out.Int(int(in.Page))
+		out.Int(int(in.Limit))
 	}
 	{
-		const prefix string = ",\"pageSize\":"
+		const prefix string = ",\"offset\":"
 		out.RawString(prefix)
-		out.Int(int(in.PageSize))
+		out.Int(int(in.Offset))
 	}
 	{
 		const prefix string = ",\"total\":"
