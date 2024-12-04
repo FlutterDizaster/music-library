@@ -24,3 +24,9 @@ repos:
         entry: sh -c 'golangci-lint run --allow-parallel-runners ./...'
         language: system
         types: [go]
+
+      - id: swag-fmt
+        name: swag-fmt
+        entry: sh -c 'swag fmt --dir ./internal/server/handler,./internal/models'
+        language: system
+        types: [go]

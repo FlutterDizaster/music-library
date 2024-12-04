@@ -21,14 +21,14 @@ func mainWithCode() int {
 	)
 
 	// Gracefull shutdown context
-	ctx, cancle := signal.NotifyContext(
+	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
 	)
-	defer cancle()
+	defer cancel()
 
 	// Application settings
 	settings := application.Settings{}
