@@ -65,8 +65,8 @@ func (h *musicDataHandler) registerRoutes() {
 //	@Tags			Songs
 //	@Accept			json
 //	@Produce		json
-//	@Param			page		query		int		false	"Page number"
-//	@Param			pageSize	query		int		false	"Number of songs per page"
+//	@Param			limit		query		int		false	"Maximum number of songs to return"
+//	@Param			offset		query		int		false	"Number of songs to skip"
 //	@Param			title		query		string	false	"Song title"
 //	@Param			group		query		string	false	"Song band"
 //	@Param			releaseDate	query		string	false	"Song release date (format: DD-MM-YYYY, valid values: >DD-MM-YYYY, <DD-MM-YYYY, DD-MM-YYYY, DD-MM-YYYY~DD-MM-YYYY)"
@@ -115,12 +115,12 @@ func (h *musicDataHandler) getLibraryHandler(w http.ResponseWriter, r *http.Requ
 //	@Tags			Songs
 //	@Accept			json
 //	@Produce		json
-//	@Param			id			path		string	true	"Song ID"
-//	@Param			page		query		string	false	"Page number"
-//	@Param			pageSize	query		string	false	"Number of verses per page"
-//	@Success		200			{object}	models.Lyrics
-//	@Failure		400			{string}	string	"Invalid ID or query parameters"
-//	@Failure		500			{string}	string	"Internal server error"
+//	@Param			id		path		string	true	"Song ID"
+//	@Param			limit	query		string	false	"Maximum number of verses to return"
+//	@Param			offset	query		string	false	"Number of verses to skip"
+//	@Success		200		{object}	models.Lyrics
+//	@Failure		400		{string}	string	"Invalid ID or query parameters"
+//	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/song/{id}/lyrics [get]
 //
 // .

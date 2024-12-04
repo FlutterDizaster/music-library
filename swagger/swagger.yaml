@@ -26,9 +26,9 @@ definitions:
     type: object
   models.Pagination:
     properties:
-      page:
+      limit:
         type: integer
-      pageSize:
+      offset:
         type: integer
       total:
         type: integer
@@ -82,13 +82,13 @@ paths:
       - application/json
       description: Retrieves the music library with optional filters and pagination.
       parameters:
-      - description: Page number
+      - description: Maximum number of songs to return
         in: query
-        name: page
+        name: limit
         type: integer
-      - description: Number of songs per page
+      - description: Number of songs to skip
         in: query
-        name: pageSize
+        name: offset
         type: integer
       - description: Song title
         in: query
@@ -231,13 +231,13 @@ paths:
         name: id
         required: true
         type: string
-      - description: Page number
+      - description: Maximum number of verses to return
         in: query
-        name: page
+        name: limit
         type: string
-      - description: Number of verses per page
+      - description: Number of verses to skip
         in: query
-        name: pageSize
+        name: offset
         type: string
       produces:
       - application/json

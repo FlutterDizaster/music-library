@@ -38,14 +38,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
+                        "description": "Maximum number of songs to return",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Number of songs per page",
-                        "name": "pageSize",
+                        "description": "Number of songs to skip",
+                        "name": "offset",
                         "in": "query"
                     },
                     {
@@ -262,14 +262,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Page number",
-                        "name": "page",
+                        "description": "Maximum number of verses to return",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Number of verses per page",
-                        "name": "pageSize",
+                        "description": "Number of verses to skip",
+                        "name": "offset",
                         "in": "query"
                     }
                 ],
@@ -339,10 +339,10 @@ const docTemplate = `{
         "models.Pagination": {
             "type": "object",
             "properties": {
-                "page": {
+                "limit": {
                     "type": "integer"
                 },
-                "pageSize": {
+                "offset": {
                     "type": "integer"
                 },
                 "total": {
