@@ -77,7 +77,7 @@ music-library/
 │   ├── abstraction/   # Abstractions and interfaces
 │   ├── apperrors/     # Custom errors
 │   ├── application/   # Application bootstrap logic
-│   ├── controller/    # REST API controllers
+│   ├── controller/    # Music library controller
 │   ├── metrics/       # Application metrics
 │   ├── models/        # Data entities
 │   ├── params/        # Request parameters
