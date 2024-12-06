@@ -62,7 +62,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Song release date (format: DD-MM-YYYY, valid values: \u003eDD-MM-YYYY, \u003cDD-MM-YYYY, DD-MM-YYYY, DD-MM-YYYY~DD-MM-YYYY)",
+                        "description": "Song release date (format: DD.MM.YYYY, valid values: \u003eDD.MM.YYYY, \u003cDD.MM.YYYY, DD.MM.YYYY, DD.MM.YYYY-DD.MM.YYYY)",
                         "name": "releaseDate",
                         "in": "query"
                     },

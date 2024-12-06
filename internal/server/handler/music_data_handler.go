@@ -69,7 +69,7 @@ func (h *musicDataHandler) registerRoutes() {
 //	@Param			offset		query		int		false	"Number of songs to skip"
 //	@Param			title		query		string	false	"Song title"
 //	@Param			group		query		string	false	"Song band"
-//	@Param			releaseDate	query		string	false	"Song release date (format: DD-MM-YYYY, valid values: >DD-MM-YYYY, <DD-MM-YYYY, DD-MM-YYYY, DD-MM-YYYY~DD-MM-YYYY)"
+//	@Param			releaseDate	query		string	false	"Song release date (format: DD.MM.YYYY, valid values: >DD.MM.YYYY, <DD.MM.YYYY, DD.MM.YYYY, DD.MM.YYYY-DD.MM.YYYY)"
 //	@Param			text		query		string	false	"Song lyrics fragment"
 //	@Param			link		query		string	false	"Song link"
 //	@Success		200			{object}	models.Library

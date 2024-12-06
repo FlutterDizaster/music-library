@@ -98,8 +98,8 @@ paths:
         in: query
         name: group
         type: string
-      - description: 'Song release date (format: DD-MM-YYYY, valid values: >DD-MM-YYYY,
-          <DD-MM-YYYY, DD-MM-YYYY, DD-MM-YYYY~DD-MM-YYYY)'
+      - description: 'Song release date (format: DD.MM.YYYY, valid values: >DD.MM.YYYY,
+          <DD.MM.YYYY, DD.MM.YYYY, DD.MM.YYYY-DD.MM.YYYY)'
         in: query
         name: releaseDate
         type: string
