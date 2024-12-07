@@ -3,7 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/FlutterDizaster/music-library/internal/server/middleware"
+	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
+	"github.com/FlutterDizaster/music-library/internal/presentation/middleware"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -26,17 +27,17 @@ import (
 // Handler is a general HTTP handler.
 // Must be created with New function.
 type Handler struct {
-	router     *http.ServeMux
-	controller MusicDataController
-	registry   middleware.MetricsRegistry
+	router   *http.ServeMux
+	service  interfaces.MusicService
+	registry interfaces.HTTPMetricsRegistry
 }
 
 // New returns a new Handler.
-// Accepts a data controller and a registry for metrics.
-func New(controller MusicDataController, registry middleware.MetricsRegistry) *Handler {
+// Accepts a data service and a registry for metrics.
+func New(service interfaces.MusicService, registry interfaces.HTTPMetricsRegistry) *Handler {
 	h := &Handler{
-		controller: controller,
-		registry:   registry,
+		service:  service,
+		registry: registry,
 	}
 
 	h.registerRoutes()
@@ -60,7 +61,7 @@ func (h *Handler) registerRoutes() {
 	)
 
 	// Setup routes
-	musicDataRouter := newMusicDataHandler(h.controller)
+	musicDataRouter := newMusicHandler(h.service)
 
 	router.Handle("/api/v1", middlewareChain(http.StripPrefix("/api/v1", musicDataRouter)))
 	router.Handle("GET /metrics", promhttp.Handler())

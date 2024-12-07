@@ -1,7 +1,18 @@
 package apperrors
 
+var (
+	ErrInvalidDateLayout = Error{
+		Message: "invalid date layout",
+	}
+	ErrInvalidDateFormat = Error{
+		Message: "invalid date format",
+	}
+	ErrInvalidDateRange = Error{
+		Message: "invalid date range",
+	}
+)
+
 type Error struct {
-	Err     error
 	Message string
 }
 

@@ -2,40 +2,27 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
 
 	"github.com/FlutterDizaster/music-library/internal/apperrors"
-	"github.com/FlutterDizaster/music-library/internal/models"
+	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
+	"github.com/FlutterDizaster/music-library/internal/domain/models"
 	"github.com/google/uuid"
 )
 
-// MusicDataController is an interface for music data operations.
-type MusicDataController interface {
-	GetLibrary(ctx context.Context, params map[string][]string) (models.Library, error)
-	GetSongLyrics(
-		ctx context.Context,
-		id uuid.UUID,
-		params map[string][]string,
-	) (models.Lyrics, error)
-	AddSong(ctx context.Context, title models.SongTitle) (uuid.UUID, error)
-	DeleteSong(ctx context.Context, id uuid.UUID) error
-	UpdateSong(ctx context.Context, song models.Song) error
+// musicHandler handles music data operations.
+// Must be created with newmusicHandler function.
+type musicHandler struct {
+	router  *http.ServeMux
+	service interfaces.MusicService
 }
 
-// musicDataHandler handles music data operations.
-// Must be created with newMusicDataHandler function.
-type musicDataHandler struct {
-	router     *http.ServeMux
-	controller MusicDataController
-}
-
-func newMusicDataHandler(controller MusicDataController) *musicDataHandler {
-	h := &musicDataHandler{
-		controller: controller,
+func newMusicHandler(service interfaces.MusicService) *musicHandler {
+	h := &musicHandler{
+		service: service,
 	}
 
 	h.registerRoutes()
@@ -44,11 +31,11 @@ func newMusicDataHandler(controller MusicDataController) *musicDataHandler {
 }
 
 // ServeHTTP implements http.Handler interface.
-func (h *musicDataHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.router.ServeHTTP(w, r)
 }
 
-func (h *musicDataHandler) registerRoutes() {
+func (h *musicHandler) registerRoutes() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /library", h.getLibraryHandler)
@@ -80,10 +67,10 @@ func (h *musicDataHandler) registerRoutes() {
 // .
 //
 //nolint:lll // too long comment
-func (h *musicDataHandler) getLibraryHandler(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) getLibraryHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 
-	library, err := h.controller.GetLibrary(r.Context(), params)
+	library, err := h.service.GetLibrary(r.Context(), params)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):
@@ -124,7 +111,7 @@ func (h *musicDataHandler) getLibraryHandler(w http.ResponseWriter, r *http.Requ
 //	@Router			/song/{id}/lyrics [get]
 //
 // .
-func (h *musicDataHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
@@ -134,7 +121,7 @@ func (h *musicDataHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.R
 
 	params := r.URL.Query()
 
-	lyrics, err := h.controller.GetSongLyrics(r.Context(), id, params)
+	lyrics, err := h.service.GetSongLyrics(r.Context(), id, params)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):
@@ -173,7 +160,7 @@ func (h *musicDataHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.R
 //	@Router			/song [post]
 //
 // .
-func (h *musicDataHandler) addSongHandler(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) addSongHandler(w http.ResponseWriter, r *http.Request) {
 	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
 		http.Error(w, "Wrong content type", http.StatusBadRequest)
 		return
@@ -194,7 +181,7 @@ func (h *musicDataHandler) addSongHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	id, err := h.controller.AddSong(r.Context(), title)
+	id, err := h.service.AddSong(r.Context(), title)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):
@@ -226,7 +213,7 @@ func (h *musicDataHandler) addSongHandler(w http.ResponseWriter, r *http.Request
 //	@Router			/song/{id} [patch]
 //
 // .
-func (h *musicDataHandler) updateSongHandler(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) updateSongHandler(w http.ResponseWriter, r *http.Request) {
 	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
 		http.Error(w, "Wrong content type", http.StatusBadRequest)
 		return
@@ -255,7 +242,7 @@ func (h *musicDataHandler) updateSongHandler(w http.ResponseWriter, r *http.Requ
 	}
 	song.ID = id
 
-	err = h.controller.UpdateSong(r.Context(), song)
+	err = h.service.UpdateSong(r.Context(), song)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):
@@ -280,7 +267,7 @@ func (h *musicDataHandler) updateSongHandler(w http.ResponseWriter, r *http.Requ
 //	@Router			/song/{id} [delete]
 //
 // .
-func (h *musicDataHandler) deleteSongHandler(w http.ResponseWriter, r *http.Request) {
+func (h *musicHandler) deleteSongHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
@@ -288,7 +275,7 @@ func (h *musicDataHandler) deleteSongHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = h.controller.DeleteSong(r.Context(), id)
+	err = h.service.DeleteSong(r.Context(), id)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):

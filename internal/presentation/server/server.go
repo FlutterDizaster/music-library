@@ -64,6 +64,7 @@ func (s *Server) Start(ctx context.Context) error {
 		<-egCtx.Done()
 
 		// Skip shutdown if error on start
+		//TODO: Explain in comment
 		if errOnStart {
 			return nil
 		}

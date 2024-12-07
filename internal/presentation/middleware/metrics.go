@@ -4,26 +4,18 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-)
 
-// MetricsRegistry is a registry for metrics.
-type MetricsRegistry interface {
-	DecrementActiveConnections()
-	IncrementActiveConnections()
-	IncrementRequestsTotal(method string, status string, endpoint string)
-	ObserveRequestDuration(method string, status string, endpoint string, duration float64)
-	ObserveRequestSize(method string, status string, endpoint string, size float64)
-	ObserveResponseSize(method string, status string, endpoint string, size float64)
-}
+	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
+)
 
 // Metrics is a statefull middleware that records metrics.
 // Must be created with NewMetricsMiddleware function.
 type Metrics struct {
-	registry MetricsRegistry
+	registry interfaces.HTTPMetricsRegistry
 }
 
 // NewMetricsMiddleware returns a new Metrics middleware.
-func NewMetricsMiddleware(registry MetricsRegistry) *Metrics {
+func NewMetricsMiddleware(registry interfaces.HTTPMetricsRegistry) *Metrics {
 	return &Metrics{
 		registry: registry,
 	}
