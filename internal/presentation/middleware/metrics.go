@@ -2,20 +2,21 @@ package middleware
 
 import (
 	"net/http"
+
 	"strconv"
 	"time"
 
-	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
+	"github.com/FlutterDizaster/music-library/internal/infrastructure/metrics"
 )
 
 // Metrics is a statefull middleware that records metrics.
 // Must be created with NewMetricsMiddleware function.
 type Metrics struct {
-	registry interfaces.HTTPMetricsRegistry
+	registry metrics.HTTPMetricsRegistry
 }
 
 // NewMetricsMiddleware returns a new Metrics middleware.
-func NewMetricsMiddleware(registry interfaces.HTTPMetricsRegistry) *Metrics {
+func NewMetricsMiddleware(registry metrics.HTTPMetricsRegistry) *Metrics {
 	return &Metrics{
 		registry: registry,
 	}

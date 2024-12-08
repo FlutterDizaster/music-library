@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/FlutterDizaster/music-library/internal/apperrors"
@@ -70,7 +71,23 @@ func (h *musicHandler) registerRoutes() {
 func (h *musicHandler) getLibraryHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 
-	library, err := h.service.GetLibrary(r.Context(), params)
+	rawFilters := models.RawFilters{
+		Title:       params.Get("title"),
+		Group:       params.Get("group"),
+		ReleaseDate: params.Get("releaseDate"),
+		Text:        params.Get("text"),
+		Link:        params.Get("link"),
+		Limit:       params.Get("limit"),
+		Offset:      params.Get("offset"),
+	}
+
+	filters, err := rawFilters.ToFilters()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	library, err := h.service.GetLibrary(r.Context(), *filters)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):
@@ -121,7 +138,23 @@ func (h *musicHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Reque
 
 	params := r.URL.Query()
 
-	lyrics, err := h.service.GetSongLyrics(r.Context(), id, params)
+	limit, err := strconv.Atoi(params.Get("limit"))
+	if err != nil {
+		http.Error(w, "Invalid limit", http.StatusBadRequest)
+		return
+	}
+	offset, err := strconv.Atoi(params.Get("offset"))
+	if err != nil {
+		http.Error(w, "Invalid offset", http.StatusBadRequest)
+		return
+	}
+
+	pagination := models.Pagination{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	lyrics, err := h.service.GetSongLyrics(r.Context(), id, pagination)
 	var apperror *apperrors.Error
 	switch {
 	case errors.As(err, &apperror):

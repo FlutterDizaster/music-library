@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
 	"github.com/FlutterDizaster/music-library/internal/domain/models"
@@ -18,6 +19,8 @@ type Service struct {
 	detailRepo interfaces.DetailsRepository
 }
 
+var _ interfaces.MusicService = (*Service)(nil)
+
 func New(settings Settings) *Service {
 	return &Service{
 		musicRepo:  settings.MusicRepo,
@@ -27,32 +30,47 @@ func New(settings Settings) *Service {
 
 func (c *Service) GetLibrary(
 	ctx context.Context,
-	params map[string][]string,
+	filters models.Filters,
 ) (models.Library, error) {
-	// buildedParams, err := c.paramsBuilder.Build(params)
-	// if err != nil {
-	// 	return models.Library{}, err
-	// }
-
-	// library, err := c.musicRepo.GetLibrary(ctx, buildedParams)
-	// if err != nil {
-	// 	return models.Library{}, err
-	// }
-
-	// return library, nil
-	return models.Library{}, nil
+	return c.musicRepo.GetLibrary(ctx, filters)
 }
 
-// FIXME: rewrite.
 func (c *Service) GetSongLyrics(
 	ctx context.Context,
 	id uuid.UUID,
-	params map[string][]string,
+	pagination models.Pagination,
 ) (models.Lyrics, error) {
-	// TODO: Get lyrics
-	// Filter pagination
-	// return result
-	return models.Lyrics{}, nil
+	rawLyrics, err := c.musicRepo.GetSongLyrics(ctx, id)
+	if err != nil {
+		return models.Lyrics{}, err
+	}
+
+	verbsArr := strings.Split(rawLyrics, "\n\n")
+	pagination.Total = len(verbsArr)
+
+	if pagination.Limit == 0 {
+		pagination.Limit = len(verbsArr)
+	}
+
+	if len(verbsArr) <= pagination.Offset {
+		pagination.Limit = 0
+		pagination.Offset = len(verbsArr)
+		return models.Lyrics{
+			Lyrics:     "",
+			Pagination: pagination,
+		}, nil
+	}
+
+	if len(verbsArr) < pagination.Limit+pagination.Offset {
+		pagination.Limit = len(verbsArr) - pagination.Offset
+	}
+
+	lyrics := strings.Join(verbsArr[pagination.Offset:pagination.Offset+pagination.Limit], "\n\n")
+
+	return models.Lyrics{
+		Lyrics:     lyrics,
+		Pagination: pagination,
+	}, nil
 }
 
 func (c *Service) AddSong(ctx context.Context, title models.SongTitle) (uuid.UUID, error) {

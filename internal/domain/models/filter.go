@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -28,8 +29,8 @@ type RawFilters struct {
 	ReleaseDate string
 	Text        string
 	Link        string
-	Limit       int
-	Offset      int
+	Limit       string
+	Offset      string
 }
 
 type Filters struct {
@@ -50,17 +51,25 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 		group:    r.Group,
 		text:     r.Text,
 		link:     r.Link,
-		limit:    r.Limit,
-		offset:   r.Offset,
 		dateFrom: time.Time{},
 		dateTo:   time.Time{},
+	}
+
+	var err error
+
+	f.limit, err = strconv.Atoi(r.Limit)
+	if err != nil {
+		return nil, apperrors.ErrInvalidFilters
+	}
+
+	f.offset, err = strconv.Atoi(r.Offset)
+	if err != nil {
+		return nil, apperrors.ErrInvalidFilters
 	}
 
 	if r.ReleaseDate == "" {
 		return f, nil
 	}
-
-	var err error
 
 	switch {
 	case strings.HasPrefix(r.ReleaseDate, ">"):

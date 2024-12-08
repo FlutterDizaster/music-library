@@ -1,4 +1,4 @@
-package interfaces
+package metrics
 
 // MetricsRegistry is a registry for metrics.
 type HTTPMetricsRegistry interface {

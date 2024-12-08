@@ -10,6 +10,10 @@ var (
 	ErrInvalidDateRange = Error{
 		Message: "invalid date range",
 	}
+
+	ErrInvalidFilters = Error{
+		Message: "invalid filters",
+	}
 )
 
 type Error struct {

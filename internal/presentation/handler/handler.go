@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
+	"github.com/FlutterDizaster/music-library/internal/infrastructure/metrics"
 	"github.com/FlutterDizaster/music-library/internal/presentation/middleware"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -29,12 +30,12 @@ import (
 type Handler struct {
 	router   *http.ServeMux
 	service  interfaces.MusicService
-	registry interfaces.HTTPMetricsRegistry
+	registry metrics.HTTPMetricsRegistry
 }
 
 // New returns a new Handler.
 // Accepts a data service and a registry for metrics.
-func New(service interfaces.MusicService, registry interfaces.HTTPMetricsRegistry) *Handler {
+func New(service interfaces.MusicService, registry metrics.HTTPMetricsRegistry) *Handler {
 	h := &Handler{
 		service:  service,
 		registry: registry,

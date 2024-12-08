@@ -2,7 +2,7 @@ package metrics
 
 import "github.com/prometheus/client_golang/prometheus"
 
-type HTTPMetricsRegistry struct {
+type MetricsRegistry struct {
 	service string
 
 	httpActiveConnections *prometheus.GaugeVec
@@ -12,7 +12,7 @@ type HTTPMetricsRegistry struct {
 	httpResponseSize      *prometheus.HistogramVec
 }
 
-func New(service string) *HTTPMetricsRegistry {
+func New(service string) *MetricsRegistry {
 	httpLabels := []string{
 		"method",   // http method
 		"status",   // http status code
@@ -20,7 +20,7 @@ func New(service string) *HTTPMetricsRegistry {
 		"service",  // application name
 	}
 
-	r := &HTTPMetricsRegistry{
+	r := &MetricsRegistry{
 		service: service,
 		httpActiveConnections: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -71,29 +71,29 @@ func New(service string) *HTTPMetricsRegistry {
 	return r
 }
 
-func (r *HTTPMetricsRegistry) IncrementActiveConnections() {
+func (r *MetricsRegistry) IncrementActiveConnections() {
 	r.httpActiveConnections.WithLabelValues(r.service).Inc()
 }
 
-func (r *HTTPMetricsRegistry) DecrementActiveConnections() {
+func (r *MetricsRegistry) DecrementActiveConnections() {
 	r.httpActiveConnections.WithLabelValues(r.service).Dec()
 }
 
-func (r *HTTPMetricsRegistry) IncrementRequestsTotal(method, status, endpoint string) {
+func (r *MetricsRegistry) IncrementRequestsTotal(method, status, endpoint string) {
 	r.httpRequestsTotal.WithLabelValues(method, status, endpoint, r.service).Inc()
 }
 
-func (r *HTTPMetricsRegistry) ObserveRequestDuration(
+func (r *MetricsRegistry) ObserveRequestDuration(
 	method, status, endpoint string,
 	duration float64,
 ) {
 	r.httpRequestDuration.WithLabelValues(method, status, endpoint, r.service).Observe(duration)
 }
 
-func (r *HTTPMetricsRegistry) ObserveRequestSize(method, status, endpoint string, size float64) {
+func (r *MetricsRegistry) ObserveRequestSize(method, status, endpoint string, size float64) {
 	r.httpRequestSize.WithLabelValues(method, status, endpoint, r.service).Observe(size)
 }
 
-func (r *HTTPMetricsRegistry) ObserveResponseSize(method, status, endpoint string, size float64) {
+func (r *MetricsRegistry) ObserveResponseSize(method, status, endpoint string, size float64) {
 	r.httpResponseSize.WithLabelValues(method, status, endpoint, r.service).Observe(size)
 }
