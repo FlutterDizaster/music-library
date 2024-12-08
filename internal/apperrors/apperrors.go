@@ -1,25 +1,40 @@
 package apperrors
 
 var (
-	ErrInvalidDateLayout = Error{
+	ErrInvalidDateLayout = UserError{
 		Message: "invalid date layout",
 	}
-	ErrInvalidDateFormat = Error{
+	ErrInvalidDateFormat = UserError{
 		Message: "invalid date format",
 	}
-	ErrInvalidDateRange = Error{
+	ErrInvalidDateRange = UserError{
 		Message: "invalid date range",
 	}
 
-	ErrInvalidFilters = Error{
+	ErrInvalidFilters = UserError{
 		Message: "invalid filters",
+	}
+
+	ErrBadDetailsRequest = UserError{
+		Message: "details for song not found",
+	}
+	ErrDetailsServerBadResponse = AppError{
+		Message: "details server send bad response",
 	}
 )
 
-type Error struct {
+type UserError struct {
 	Message string
 }
 
-func (e Error) Error() string {
+func (e UserError) Error() string {
+	return e.Message
+}
+
+type AppError struct {
+	Message string
+}
+
+func (e AppError) Error() string {
 	return e.Message
 }

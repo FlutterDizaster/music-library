@@ -88,7 +88,7 @@ func (h *musicHandler) getLibraryHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	library, err := h.service.GetLibrary(r.Context(), *filters)
-	var apperror *apperrors.Error
+	var apperror *apperrors.UserError
 	switch {
 	case errors.As(err, &apperror):
 		http.Error(w, apperror.Message, http.StatusBadRequest)
@@ -155,7 +155,7 @@ func (h *musicHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	lyrics, err := h.service.GetSongLyrics(r.Context(), id, pagination)
-	var apperror *apperrors.Error
+	var apperror *apperrors.UserError
 	switch {
 	case errors.As(err, &apperror):
 		http.Error(w, apperror.Message, http.StatusBadRequest)
@@ -215,7 +215,7 @@ func (h *musicHandler) addSongHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, err := h.service.AddSong(r.Context(), title)
-	var apperror *apperrors.Error
+	var apperror *apperrors.UserError
 	switch {
 	case errors.As(err, &apperror):
 		http.Error(w, apperror.Message, http.StatusBadRequest)
@@ -276,7 +276,7 @@ func (h *musicHandler) updateSongHandler(w http.ResponseWriter, r *http.Request)
 	song.ID = id
 
 	err = h.service.UpdateSong(r.Context(), song)
-	var apperror *apperrors.Error
+	var apperror *apperrors.UserError
 	switch {
 	case errors.As(err, &apperror):
 		http.Error(w, apperror.Message, http.StatusBadRequest)
@@ -309,7 +309,7 @@ func (h *musicHandler) deleteSongHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	err = h.service.DeleteSong(r.Context(), id)
-	var apperror *apperrors.Error
+	var apperror *apperrors.UserError
 	switch {
 	case errors.As(err, &apperror):
 		http.Error(w, apperror.Message, http.StatusBadRequest)
