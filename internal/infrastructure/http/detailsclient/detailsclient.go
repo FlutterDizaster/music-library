@@ -27,6 +27,9 @@ type DetailsClient struct {
 
 var _ interfaces.DetailsRepository = (*DetailsClient)(nil)
 
+// New returns a new DetailsClient instance based on the provided settings.
+// It configures the Resty client with the provided settings, sets the retry count and
+// backoff time, and sets the base URL.
 func New(settings Settings) *DetailsClient {
 	slog.Debug("Creating details client", slog.String("addr", settings.Addr))
 	client := resty.New().
@@ -41,6 +44,17 @@ func New(settings Settings) *DetailsClient {
 	}
 }
 
+// GetSongDetails retrieves the details of a song with the given title from the details server.
+//
+// It logs debug messages before and after retrieving the details, and error messages if an error occurs.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - title: The models.SongTitle of the song whose details are to be retrieved.
+//
+// Returns:
+//   - The models.SongDetail of the song if successful.
+//   - An error if the operation fails or if no details are found.
 func (c *DetailsClient) GetSongDetails(
 	ctx context.Context,
 	title models.SongTitle,

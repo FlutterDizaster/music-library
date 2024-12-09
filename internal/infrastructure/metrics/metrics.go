@@ -12,6 +12,15 @@ type MetricsRegistry struct {
 	httpResponseSize      *prometheus.HistogramVec
 }
 
+// New returns a new MetricsRegistry instance based on the provided service name.
+// It configures the following metrics:
+// - http_active_connections: number of active HTTP connections
+// - http_requests_total: number of HTTP requests
+// - http_request_duration: duration of HTTP requests
+// - http_request_size: size of HTTP requests
+// - http_response_size: size of HTTP responses
+//
+// The metrics are registered with the global prometheus registry.
 func New(service string) *MetricsRegistry {
 	httpLabels := []string{
 		"method",   // http method
@@ -71,18 +80,28 @@ func New(service string) *MetricsRegistry {
 	return r
 }
 
+// IncrementActiveConnections increments the "http_active_connections" counter
+// for the given service by one.
 func (r *MetricsRegistry) IncrementActiveConnections() {
 	r.httpActiveConnections.WithLabelValues(r.service).Inc()
 }
 
+// DecrementActiveConnections decrements the "http_active_connections" gauge
+// for the given service by one.
 func (r *MetricsRegistry) DecrementActiveConnections() {
 	r.httpActiveConnections.WithLabelValues(r.service).Dec()
 }
 
+// IncrementRequestsTotal increments the "http_requests_total" counter
+// for the specified HTTP method, status, and endpoint within the context
+// of the registered service.
 func (r *MetricsRegistry) IncrementRequestsTotal(method, status, endpoint string) {
 	r.httpRequestsTotal.WithLabelValues(method, status, endpoint, r.service).Inc()
 }
 
+// ObserveRequestDuration observes the duration of an HTTP request.
+// method, status, and endpoint are labels that identify the request.
+// duration is the duration of the request in seconds.
 func (r *MetricsRegistry) ObserveRequestDuration(
 	method, status, endpoint string,
 	duration float64,
@@ -90,10 +109,16 @@ func (r *MetricsRegistry) ObserveRequestDuration(
 	r.httpRequestDuration.WithLabelValues(method, status, endpoint, r.service).Observe(duration)
 }
 
+// ObserveRequestSize records the size of an HTTP request.
+// method, status, and endpoint are labels that identify the request.
+// size is the size of the request in bytes.
 func (r *MetricsRegistry) ObserveRequestSize(method, status, endpoint string, size float64) {
 	r.httpRequestSize.WithLabelValues(method, status, endpoint, r.service).Observe(size)
 }
 
+// ObserveResponseSize records the size of an HTTP response.
+// method, status, and endpoint are labels that identify the request.
+// size is the size of the response in bytes.
 func (r *MetricsRegistry) ObserveResponseSize(method, status, endpoint string, size float64) {
 	r.httpResponseSize.WithLabelValues(method, status, endpoint, r.service).Observe(size)
 }

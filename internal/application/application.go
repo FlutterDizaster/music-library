@@ -18,6 +18,11 @@ type Service interface {
 	Start(context.Context) error
 }
 
+// New creates a new application service with the given configuration.
+// It runs database migrations, creates a metrics registry, connects to the database,
+// creates a details server client, creates a service, creates an HTTP handler,
+// and creates a server.
+// It returns a Service and an error if any of the steps fail.
 func New(ctx context.Context, settings config.Config) (Service, error) {
 	slog.Debug("Application initialization", slog.String("stage", "running migrations"))
 	err := migrator.RunMigrations(ctx, settings.DatabaseDSN, settings.MigrationsPath)

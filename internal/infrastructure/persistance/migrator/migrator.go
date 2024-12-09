@@ -18,6 +18,19 @@ const (
 	requiredPartsLen = 2
 )
 
+// RunMigrations runs database migrations using the provided connection string and migrations path.
+//
+// It prepares the connection string, checks if the migrations path is provided,
+// and initiates the migration process. If the context is canceled, it stops the
+// migration process gracefully.
+//
+// Parameters:
+//   - ctx: The context to manage cancellation.
+//   - connStr: The database connection string.
+//   - migrationsPath: The path to the migration files.
+//
+// Returns:
+//   - An error if the migrations fail; otherwise, nil.
 func RunMigrations(ctx context.Context, connStr, migrationsPath string) error {
 	connStr = prepareDSN(connStr)
 
