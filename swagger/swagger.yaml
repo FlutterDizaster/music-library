@@ -1,0 +1,263 @@
+basePath: /api/v1
+definitions:
+  models.Library:
+    description: Response with music library and pagination.
+    properties:
+      pagination:
+        allOf:
+        - $ref: '#/definitions/models.Pagination'
+        description: Pagination
+      songs:
+        description: Songs list
+        items:
+          $ref: '#/definitions/models.Song'
+        type: array
+    type: object
+  models.Lyrics:
+    description: Response with lyrics and pagination.
+    properties:
+      lyrics:
+        description: Lyrics of the song
+        type: string
+      pagination:
+        allOf:
+        - $ref: '#/definitions/models.Pagination'
+        description: Pagination
+    type: object
+  models.Pagination:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.Song:
+    properties:
+      group:
+        description: Name of the band
+        type: string
+      id:
+        description: ID is a unique identifier for the song
+        type: string
+      link:
+        description: Link to song
+        type: string
+      releaseDate:
+        description: 'Realease date of song format: DD-MM-YYYY'
+        type: string
+      song:
+        description: Song title
+        type: string
+      text:
+        description: Lyrics
+        type: string
+    type: object
+  models.SongTitle:
+    description: Song band and title.
+    properties:
+      group:
+        description: Name of the band
+        type: string
+      song:
+        description: Song title
+        type: string
+    type: object
+info:
+  contact:
+    email: dmitriy@loginoff.space
+    name: Dmitriy Loginov
+  description: This is the API for managing music library data, including songs, lyrics,
+    and related operations.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Music Library API
+  version: "1.0"
+paths:
+  /library:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the music library with optional filters and pagination.
+      parameters:
+      - description: Maximum number of songs to return
+        in: query
+        name: limit
+        type: integer
+      - description: Number of songs to skip
+        in: query
+        name: offset
+        type: integer
+      - description: Song title
+        in: query
+        name: title
+        type: string
+      - description: Song band
+        in: query
+        name: group
+        type: string
+      - description: 'Song release date (format: DD.MM.YYYY, valid values: >DD.MM.YYYY,
+          <DD.MM.YYYY, DD.MM.YYYY, DD.MM.YYYY-DD.MM.YYYY)'
+        in: query
+        name: releaseDate
+        type: string
+      - description: Song lyrics fragment
+        in: query
+        name: text
+        type: string
+      - description: Song link
+        in: query
+        name: link
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Library'
+        "400":
+          description: Invalid query parameters
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get songs library
+      tags:
+      - Songs
+  /song:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new song to the music library.
+      parameters:
+      - description: Song title details
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongTitle'
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Song ID
+          schema:
+            type: string
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Add a new song
+      tags:
+      - Songs
+  /song/{id}:
+    delete:
+      description: Deletes a song by ID.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: Delete successful (no content returned)
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete a song
+      tags:
+      - Songs
+    patch:
+      consumes:
+      - application/json
+      description: Updates details of an existing song.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated song details
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Update successful (no content returned)
+          schema:
+            type: string
+        "400":
+          description: Invalid ID or request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a song
+      tags:
+      - Songs
+  /song/{id}/lyrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the lyrics for a specific song by ID.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Maximum number of verses to return
+        in: query
+        name: limit
+        type: string
+      - description: Number of verses to skip
+        in: query
+        name: offset
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Lyrics'
+        "400":
+          description: Invalid ID or query parameters
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get song lyrics
+      tags:
+      - Songs
+swagger: "2.0"
+tags:
+- description: Operations about songs
+  name: Songs
