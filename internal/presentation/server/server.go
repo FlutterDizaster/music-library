@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	defaultShutdownMaxTime = 5 * time.Second
+	shutdownMaxTime = 5 * time.Second
 )
 
 // Settings used to create Server.
@@ -37,7 +37,7 @@ type Server struct {
 func New(settings Settings) *Server {
 	s := &Server{
 		addr:            settings.Addr,
-		shutdownMaxTime: defaultShutdownMaxTime,
+		shutdownMaxTime: shutdownMaxTime,
 	}
 
 	s.server = &http.Server{
@@ -64,7 +64,6 @@ func (s *Server) Start(ctx context.Context) error {
 		<-egCtx.Done()
 
 		// Skip shutdown if error on start
-		//TODO: Explain in comment
 		if errOnStart {
 			return nil
 		}
@@ -84,6 +83,8 @@ func (s *Server) Start(ctx context.Context) error {
 		}
 		return nil
 	})
+
+	slog.Info("Server started", "addr", s.addr)
 
 	return eg.Wait()
 }

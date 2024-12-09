@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/FlutterDizaster/music-library/internal/application"
+	"github.com/FlutterDizaster/music-library/internal/application/config"
 )
 
 func main() {
@@ -31,17 +32,21 @@ func mainWithCode() int {
 	defer cancel()
 
 	// Application settings
-	settings := application.Settings{}
-
-	// TODO: Load config to settings struct
-
-	// Application initialization
-	app, err := application.New(ctx, settings)
+	settings, err := config.LoadConfig()
 	if err != nil {
-		slog.Error("Application initialization failed", slog.Any("error", err))
+		slog.Error("Failed to load config", slog.Any("error", err))
 		return 1
 	}
 
+	slog.Debug("Initializing application")
+	// Application initialization
+	app, err := application.New(ctx, *settings)
+	if err != nil {
+		slog.Error("Application initialization failed")
+		return 1
+	}
+
+	slog.Debug("Starting application")
 	// Application start
 	if err = app.Start(ctx); err != nil {
 		slog.Error("Application start failed", slog.Any("error", err))

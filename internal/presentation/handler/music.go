@@ -22,21 +22,25 @@ type musicHandler struct {
 }
 
 func newMusicHandler(service interfaces.MusicService) *musicHandler {
+	slog.Debug("Creating music handler")
 	h := &musicHandler{
 		service: service,
 	}
 
 	h.registerRoutes()
 
+	slog.Debug("Music handler created")
 	return h
 }
 
 // ServeHTTP implements http.Handler interface.
 func (h *musicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("Handling request in music handler", slog.String("path", r.URL.Path))
 	h.router.ServeHTTP(w, r)
 }
 
 func (h *musicHandler) registerRoutes() {
+	slog.Debug("Creating music handler", slog.String("stage", "registering routes"))
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /library", h.getLibraryHandler)
@@ -46,6 +50,7 @@ func (h *musicHandler) registerRoutes() {
 	router.HandleFunc("DELETE /song/{id}", h.deleteSongHandler)
 
 	h.router = router
+	slog.Debug("Creating music handler", slog.String("stage", "routes registered"))
 }
 
 //	@Summary		Get songs library
@@ -55,7 +60,7 @@ func (h *musicHandler) registerRoutes() {
 //	@Produce		json
 //	@Param			limit		query		int		false	"Maximum number of songs to return"
 //	@Param			offset		query		int		false	"Number of songs to skip"
-//	@Param			title		query		string	false	"Song title"
+//	@Param			song		query		string	false	"Song title"
 //	@Param			group		query		string	false	"Song band"
 //	@Param			releaseDate	query		string	false	"Song release date (format: DD.MM.YYYY, valid values: >DD.MM.YYYY, <DD.MM.YYYY, DD.MM.YYYY, DD.MM.YYYY-DD.MM.YYYY)"
 //	@Param			text		query		string	false	"Song lyrics fragment"
@@ -72,7 +77,7 @@ func (h *musicHandler) getLibraryHandler(w http.ResponseWriter, r *http.Request)
 	params := r.URL.Query()
 
 	rawFilters := models.RawFilters{
-		Title:       params.Get("title"),
+		Title:       params.Get("song"),
 		Group:       params.Get("group"),
 		ReleaseDate: params.Get("releaseDate"),
 		Text:        params.Get("text"),
@@ -138,15 +143,25 @@ func (h *musicHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Reque
 
 	params := r.URL.Query()
 
-	limit, err := strconv.Atoi(params.Get("limit"))
-	if err != nil {
-		http.Error(w, "Invalid limit", http.StatusBadRequest)
-		return
+	var (
+		limit  int
+		offset int
+	)
+
+	if rawLimit := params.Get("limit"); rawLimit != "" {
+		limit, err = strconv.Atoi(params.Get("limit"))
+		if err != nil {
+			http.Error(w, "Invalid limit", http.StatusBadRequest)
+			return
+		}
 	}
-	offset, err := strconv.Atoi(params.Get("offset"))
-	if err != nil {
-		http.Error(w, "Invalid offset", http.StatusBadRequest)
-		return
+
+	if rawOffset := params.Get("offset"); rawOffset != "" {
+		offset, err = strconv.Atoi(params.Get("offset"))
+		if err != nil {
+			http.Error(w, "Invalid offset", http.StatusBadRequest)
+			return
+		}
 	}
 
 	pagination := models.Pagination{
@@ -194,7 +209,7 @@ func (h *musicHandler) getSongLyricsHandler(w http.ResponseWriter, r *http.Reque
 //
 // .
 func (h *musicHandler) addSongHandler(w http.ResponseWriter, r *http.Request) {
-	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+	if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		http.Error(w, "Wrong content type", http.StatusBadRequest)
 		return
 	}
@@ -247,7 +262,7 @@ func (h *musicHandler) addSongHandler(w http.ResponseWriter, r *http.Request) {
 //
 // .
 func (h *musicHandler) updateSongHandler(w http.ResponseWriter, r *http.Request) {
-	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+	if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		http.Error(w, "Wrong content type", http.StatusBadRequest)
 		return
 	}

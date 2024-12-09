@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strings"
 
-	"github.com/mattes/migrate"
+	"github.com/golang-migrate/migrate/v4"
 
 	//nolint:revieve // This is for migrate
 	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
@@ -13,7 +14,13 @@ import (
 	_ "github.com/jackc/pgx/v5"
 )
 
+const (
+	requiredPartsLen = 2
+)
+
 func RunMigrations(ctx context.Context, connStr, migrationsPath string) error {
+	connStr = prepareDSN(connStr)
+
 	if migrationsPath == "" {
 		slog.Debug("Skipping migrations")
 		return nil
@@ -51,4 +58,24 @@ func RunMigrations(ctx context.Context, connStr, migrationsPath string) error {
 	slog.Debug("Migrations finished")
 
 	return nil
+}
+
+func prepareDSN(connStr string) string {
+	if strings.HasPrefix(connStr, "pgx5://") {
+		return connStr
+	}
+
+	if strings.Contains(connStr, "://") {
+		parts := strings.Split(connStr, "://")
+		if len(parts) == requiredPartsLen {
+			return "pgx5://" + parts[1]
+		}
+		return ""
+	}
+
+	if connStr != "" {
+		return "pgx5://" + connStr
+	}
+
+	return connStr
 }

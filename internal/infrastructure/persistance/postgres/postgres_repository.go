@@ -13,7 +13,6 @@ import (
 	"github.com/FlutterDizaster/music-library/internal/domain/models"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -23,25 +22,9 @@ type updatingInfo struct {
 	value any
 }
 
-type pool interface {
-	Exec(
-		ctx context.Context,
-		sql string,
-		args ...any,
-	) (pgconn.CommandTag, error)
-
-	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
-
-	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
-
-	Begin(ctx context.Context) (pgx.Tx, error)
-
-	Close()
-}
-
 type Settings struct {
-	// ConnDSN is the connection string for the PostgreSQL database.
-	ConnDSN string
+	// DatabaseDSN is the connection string for the PostgreSQL database.
+	DatabaseDSN string
 
 	// RetryCount is the number of times to retry the database connection.
 	RetryCount int
@@ -53,7 +36,7 @@ type Settings struct {
 // It represents a PostgreSQL database connection pool and provides methods for interacting with the database.
 // Must be created with New function.
 type Repository struct {
-	pool    pool
+	pool    *pgxpool.Pool
 	config  *pgxpool.Config
 	connStr string
 
@@ -69,7 +52,7 @@ var _ interfaces.MusicRepository = (*Repository)(nil)
 // If the connection string is invalid or the database connection fails, it returns an error.
 func New(ctx context.Context, settings Settings) (*Repository, error) {
 	repo := &Repository{
-		connStr: settings.ConnDSN,
+		connStr: settings.DatabaseDSN,
 
 		retryCount:   settings.RetryCount,
 		retryBackoff: settings.RetryBackoff,
@@ -394,7 +377,7 @@ func (r *Repository) UpdateSong(ctx context.Context, song models.Song) error {
 	if song.Song != "" {
 		err = r.updateField(ctx, tx, updatingInfo{
 			id:    song.ID,
-			field: "song",
+			field: "title",
 			value: song.Song,
 		})
 	}
@@ -402,7 +385,7 @@ func (r *Repository) UpdateSong(ctx context.Context, song models.Song) error {
 	if err == nil && song.Group != "" {
 		err = r.updateField(ctx, tx, updatingInfo{
 			id:    song.ID,
-			field: "group",
+			field: "band",
 			value: song.Group,
 		})
 	}

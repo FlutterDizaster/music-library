@@ -58,50 +58,62 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 
 	var err error
 
-	f.limit, err = strconv.Atoi(r.Limit)
-	if err != nil {
-		return nil, apperrors.ErrInvalidFilters
+	if r.Limit != "" {
+		f.limit, err = strconv.Atoi(r.Limit)
+		if err != nil {
+			return nil, apperrors.ErrInvalidFilters
+		}
 	}
 
-	f.offset, err = strconv.Atoi(r.Offset)
-	if err != nil {
-		return nil, apperrors.ErrInvalidFilters
+	if r.Offset != "" {
+		f.offset, err = strconv.Atoi(r.Offset)
+		if err != nil {
+			return nil, apperrors.ErrInvalidFilters
+		}
 	}
 
-	if r.ReleaseDate == "" {
-		return f, nil
+	if r.ReleaseDate != "" {
+		err = r.parseDate(f)
+		if err != nil {
+			return nil, err
+		}
 	}
 
+	return f, nil
+}
+
+func (r RawFilters) parseDate(f *Filters) error {
+	var err error
 	switch {
 	case strings.HasPrefix(r.ReleaseDate, ">"):
 		f.dateMode = after
 		f.dateFrom, err = time.Parse(DateLayout, strings.TrimPrefix(r.ReleaseDate, ">"))
 		if err != nil {
-			return nil, apperrors.ErrInvalidDateLayout
+			return apperrors.ErrInvalidDateLayout
 		}
 
 	case strings.HasPrefix(r.ReleaseDate, "<"):
 		f.dateMode = before
 		f.dateFrom, err = time.Parse(DateLayout, strings.TrimPrefix(r.ReleaseDate, "<"))
 		if err != nil {
-			return nil, apperrors.ErrInvalidDateLayout
+			return apperrors.ErrInvalidDateLayout
 		}
 
 	case strings.Contains(r.ReleaseDate, "-"):
 		f.dateMode = between
 		dates := strings.Split(r.ReleaseDate, "-")
 		if len(dates) != dateRangeSliceSize {
-			return nil, apperrors.ErrInvalidDateRange
+			return apperrors.ErrInvalidDateRange
 		}
 
 		f.dateFrom, err = time.Parse(DateLayout, dates[0])
 		if err != nil {
-			return nil, apperrors.ErrInvalidDateLayout
+			return apperrors.ErrInvalidDateLayout
 		}
 
 		f.dateTo, err = time.Parse(DateLayout, dates[1])
 		if err != nil {
-			return nil, apperrors.ErrInvalidDateLayout
+			return apperrors.ErrInvalidDateLayout
 		}
 
 		if f.dateFrom.After(f.dateTo) {
@@ -111,11 +123,10 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 	default:
 		f.dateFrom, err = time.Parse(DateLayout, r.ReleaseDate)
 		if err != nil {
-			return nil, apperrors.ErrInvalidDateLayout
+			return apperrors.ErrInvalidDateLayout
 		}
 	}
-
-	return f, nil
+	return nil
 }
 
 func (f Filters) ToQueryParams() (string, []any) {
@@ -127,43 +138,43 @@ func (f Filters) ToQueryParams() (string, []any) {
 
 	// Where clause
 	if f.title != "" {
-		query += fmt.Sprintf(" AND title LIKE %d", counter)
+		query += fmt.Sprintf(" AND title LIKE $%d", counter)
 		values = append(values, f.title)
 		counter++
 	}
 	if f.group != "" {
-		query += fmt.Sprintf(" AND group = %d", counter)
+		query += fmt.Sprintf(" AND band = $%d", counter)
 		values = append(values, f.group)
 		counter++
 	}
 	if f.text != "" {
-		query += fmt.Sprintf(" AND text LIKE %d", counter)
+		query += fmt.Sprintf(" AND text LIKE $%d", counter)
 		values = append(values, f.text)
 		counter++
 	}
 	if f.link != "" {
-		query += fmt.Sprintf(" AND link LIKE %d", counter)
+		query += fmt.Sprintf(" AND link LIKE $%d", counter)
 		values = append(values, f.link)
 		counter++
 	}
 
 	switch f.dateMode {
 	case exact:
-		query += fmt.Sprintf(" AND release_date = %d", counter)
+		query += fmt.Sprintf(" AND release_date = $%d", counter)
 		values = append(values, f.dateFrom)
 	case after:
-		query += fmt.Sprintf(" AND release_date > %d", counter)
+		query += fmt.Sprintf(" AND release_date > $%d", counter)
 		values = append(values, f.dateFrom)
 	case before:
-		query += fmt.Sprintf(" AND release_date < %d", counter)
+		query += fmt.Sprintf(" AND release_date < $%d", counter)
 		values = append(values, f.dateFrom)
 	case between:
-		query += fmt.Sprintf(" AND release_date BETWEEN %d AND %d", counter, counter+1)
+		query += fmt.Sprintf(" AND release_date BETWEEN $%d AND $%d", counter, counter+1)
 		values = append(values, f.dateFrom, f.dateTo)
 	}
 
 	// Ordering, Limit and offset
-	query += fmt.Sprintf(" ORDERED BY %s ASC", orderingField)
+	query += fmt.Sprintf(" ORDER BY %s ASC", orderingField)
 	if f.limit > 0 {
 		query += fmt.Sprintf(" LIMIT %d", f.limit)
 	}

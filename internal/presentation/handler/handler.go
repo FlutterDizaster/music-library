@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
@@ -36,6 +37,7 @@ type Handler struct {
 // New returns a new Handler.
 // Accepts a data service and a registry for metrics.
 func New(service interfaces.MusicService, registry metrics.HTTPMetricsRegistry) *Handler {
+	slog.Debug("Creating handler")
 	h := &Handler{
 		service:  service,
 		registry: registry,
@@ -43,17 +45,20 @@ func New(service interfaces.MusicService, registry metrics.HTTPMetricsRegistry) 
 
 	h.registerRoutes()
 
+	slog.Debug("Handler created")
 	return h
 }
 
 // ServeHTTP implements http.Handler interface.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("Handling request in general handler", slog.String("path", r.URL.Path))
 	h.router.ServeHTTP(w, r)
 }
 
 func (h *Handler) registerRoutes() {
 	router := http.NewServeMux()
 
+	slog.Debug("Creating handler", slog.String("stage", "registering middlewares"))
 	// Setup middlewares
 	metricsMiddleware := middleware.NewMetricsMiddleware(h.registry)
 	middlewareChain := middleware.MakeChain(
@@ -61,11 +66,13 @@ func (h *Handler) registerRoutes() {
 		metricsMiddleware.Handle,
 	)
 
+	slog.Debug("Creating handler", slog.String("stage", "registering routes"))
 	// Setup routes
 	musicDataRouter := newMusicHandler(h.service)
 
-	router.Handle("/api/v1", middlewareChain(http.StripPrefix("/api/v1", musicDataRouter)))
+	router.Handle("/api/v1/", middlewareChain(http.StripPrefix("/api/v1", musicDataRouter)))
 	router.Handle("GET /metrics", promhttp.Handler())
 
 	h.router = router
+	slog.Debug("Creating handler", slog.String("stage", "routes registered"))
 }
