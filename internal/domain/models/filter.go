@@ -18,7 +18,8 @@ const (
 	between
 
 	dateRangeSliceSize = 2
-	dateLayout         = "02.01.2006"
+
+	DateLayout = "02.01.2006"
 
 	orderingField = "title"
 )
@@ -74,14 +75,14 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 	switch {
 	case strings.HasPrefix(r.ReleaseDate, ">"):
 		f.dateMode = after
-		f.dateFrom, err = time.Parse(dateLayout, strings.TrimPrefix(r.ReleaseDate, ">"))
+		f.dateFrom, err = time.Parse(DateLayout, strings.TrimPrefix(r.ReleaseDate, ">"))
 		if err != nil {
 			return nil, apperrors.ErrInvalidDateLayout
 		}
 
 	case strings.HasPrefix(r.ReleaseDate, "<"):
 		f.dateMode = before
-		f.dateFrom, err = time.Parse(dateLayout, strings.TrimPrefix(r.ReleaseDate, "<"))
+		f.dateFrom, err = time.Parse(DateLayout, strings.TrimPrefix(r.ReleaseDate, "<"))
 		if err != nil {
 			return nil, apperrors.ErrInvalidDateLayout
 		}
@@ -93,12 +94,12 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 			return nil, apperrors.ErrInvalidDateRange
 		}
 
-		f.dateFrom, err = time.Parse(dateLayout, dates[0])
+		f.dateFrom, err = time.Parse(DateLayout, dates[0])
 		if err != nil {
 			return nil, apperrors.ErrInvalidDateLayout
 		}
 
-		f.dateTo, err = time.Parse(dateLayout, dates[1])
+		f.dateTo, err = time.Parse(DateLayout, dates[1])
 		if err != nil {
 			return nil, apperrors.ErrInvalidDateLayout
 		}
@@ -108,7 +109,7 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 		}
 
 	default:
-		f.dateFrom, err = time.Parse(dateLayout, r.ReleaseDate)
+		f.dateFrom, err = time.Parse(DateLayout, r.ReleaseDate)
 		if err != nil {
 			return nil, apperrors.ErrInvalidDateLayout
 		}
@@ -119,7 +120,7 @@ func (r RawFilters) ToFilters() (*Filters, error) {
 
 func (f Filters) ToQueryParams() (string, []any) {
 	var (
-		query   = " WHERE 1=1"
+		query   = " WHERE deleted = false"
 		values  = make([]any, 0)
 		counter = 1
 	)

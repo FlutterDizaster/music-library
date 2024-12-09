@@ -18,6 +18,11 @@ var (
 	ErrBadDetailsRequest = UserError{
 		Message: "details for song not found",
 	}
+
+	ErrNoData = UserError{
+		Message: "no data found",
+	}
+
 	ErrDetailsServerBadResponse = AppError{
 		Message: "details server send bad response",
 	}
