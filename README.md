@@ -31,17 +31,18 @@ The Music Library project is the result of a test assignment.
    cd music-library
    ```
 
-3. Create a `.env` file in the root directory
+3. Configure the application (see [Configuration](#configuration)).
+   The application can read configuration parameters from the env file, but environment variables have a higher priority. So for launching using docker compose, all configuration will take place in it.
+   Please remember to provide the correct details server address.
 
-4. Configure the application (see [Configuration](#configuration)).
-
-5. Start the application containers:
+4. Start the application containers:
 
    ```bash
    docker compose up -d
    ```
+   If you use a port other than the default, you will need to make edits to the docker-compose.yaml.
 
-6. To stop the application:
+5. To stop the application:
 
    ```bash
    docker compose down
@@ -155,29 +156,6 @@ Make sure all parameters are correctly set before starting the application.
 ├── go.mod
 └── go.sum
 ```
-
----
-
-## Usage
-
-### Build and Run
-- **Build the server**:
-
-   ```bash
-   make build
-   ```
-
-- **Start the containers**:
-
-   ```bash
-   docker compose up -d
-   ```
-
-- **Stop the containers**:
-
-   ```bash
-   docker compose down
-   ```
 
 ---
 

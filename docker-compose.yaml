@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  music:
+    build: .
+    container_name: music
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring
+    environment:
+      - HTTP_ADDR=:8080
+      - DETAILS_SERVER_ADDR=http://host.docker.internal:8081
+      - DATABASE_DSN=postgres://postgresuser:postgrespass@postgres:5432/music?sslmode=disable
+    volumes:
+      - ./migrations:/app/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - monitoring
+    environment:
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespass
+      - POSTGRES_DB=music
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 2s
+      timeout: 3s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+
+networks:
+  monitoring:
+    driver: bridge

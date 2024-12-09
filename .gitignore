@@ -43,5 +43,4 @@ go.work.sum
 # Build and config folders
 # ------------------------
 /build/
-/config/
 /test/
