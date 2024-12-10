@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FlutterDizaster/music-library/internal/apperrors"
+	"github.com/FlutterDizaster/music-library/internal/application/apperrors"
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
 	"github.com/FlutterDizaster/music-library/internal/domain/models"
 	"github.com/google/uuid"
@@ -44,7 +44,9 @@ type Repository struct {
 	retryBackoff time.Duration
 }
 
-var _ interfaces.MusicRepository = (*Repository)(nil)
+var _ interfaces.LibraryRepository = (*Repository)(nil)
+var _ interfaces.LyricsRepository = (*Repository)(nil)
+var _ interfaces.SongsRepository = (*Repository)(nil)
 
 // New returns a new Repository instance based on the provided settings.
 // It configures the PostgreSQL connection based on the connection string,
@@ -227,7 +229,7 @@ func (r *Repository) GetLibrary(
 // Returns:
 //   - The lyrics as a string if successful.
 //   - An error if the operation fails or if no lyrics are found.
-func (r *Repository) GetSongLyrics(ctx context.Context, id uuid.UUID) (string, error) {
+func (r *Repository) GetLyrics(ctx context.Context, id uuid.UUID) (string, error) {
 	slog.Debug("Retrieving song lyrics", slog.String("song_id", id.String()))
 
 	var lyrics string

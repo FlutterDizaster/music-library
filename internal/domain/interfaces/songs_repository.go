@@ -7,9 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type MusicRepository interface {
-	GetLibrary(ctx context.Context, filters models.Filters) (models.Library, error)
-	GetSongLyrics(ctx context.Context, id uuid.UUID) (string, error)
+type SongsRepository interface {
 	AddSong(ctx context.Context, song models.Song) (uuid.UUID, error)
 	DeleteSong(ctx context.Context, id uuid.UUID) error
 	UpdateSong(ctx context.Context, song models.Song) error

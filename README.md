@@ -6,6 +6,16 @@ The Music Library project is the result of a test assignment.
 
 ---
 
+## C4 Architecture Visualization
+
+### Level 2: Containers
+![C4 Level 2](./docs/images/c2.png)
+
+### Level 3: Components
+![C4 Level 3](./docs/images/c3.png)
+
+---
+
 ## Features
 
 - Adding information about music tracks.
@@ -15,6 +25,14 @@ The Music Library project is the result of a test assignment.
 - Retrieving library content with support for filtering across all fields and pagination.
 - Working with data through a REST API (API documentation is available in Swagger).
 - Integration with Prometheus for collecting and storing application metrics.
+
+---
+
+## Potential Improvements
+
+- **Separate `lyrics` Table**: Create a dedicated table for storing song lyrics, as a single song may have multiple lyrics associated with it.  
+- **Optimize Update Method**: Modify the current update method to perform data updates using a single query. (Refer to the documentation for `postgres.Repository.UpdateSong()` for the reasoning behind the current implementation.)  
+- **Add Metrics Collection**: Implement metrics collection for infrastructure layer packages to monitor performance and resource usage.
 
 ---
 
@@ -166,16 +184,6 @@ API documentation is available in the following files:
 - [swagger.yaml](./swagger/swagger.yaml)
 
 To view the documentation in a convenient interface, you can use [Swagger UI](https://swagger.io/tools/swagger-ui/) or any other compatible tool.
-
----
-
-## C4 Architecture Visualization
-
-### Level 2: Containers
-![C4 Level 2](./docs/images/c2.png)
-
-### Level 3: Components
-![C4 Level 3](./docs/images/c3.png)
 
 ---
 

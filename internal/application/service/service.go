@@ -10,37 +10,69 @@ import (
 )
 
 type Settings struct {
-	MusicRepo   interfaces.MusicRepository
-	DetailsRepo interfaces.DetailsRepository
+	SongsRepo   interfaces.SongsRepository
+	LyricsRepo  interfaces.LyricsRepository
+	LibraryRepo interfaces.LibraryRepository
+	DetailsRepo interfaces.DetailsClient
 }
 
 type Service struct {
-	musicRepo  interfaces.MusicRepository
-	detailRepo interfaces.DetailsRepository
+	songsRepo   interfaces.SongsRepository
+	lyricsRepo  interfaces.LyricsRepository
+	libraryRepo interfaces.LibraryRepository
+	detailRepo  interfaces.DetailsClient
 }
 
 var _ interfaces.MusicService = (*Service)(nil)
 
+// New creates a new Service instance with the provided settings.
+// It initializes the music repository and details repository
+// using the given interfaces from the settings parameter.
 func New(settings Settings) *Service {
 	return &Service{
-		musicRepo:  settings.MusicRepo,
-		detailRepo: settings.DetailsRepo,
+		songsRepo:   settings.SongsRepo,
+		lyricsRepo:  settings.LyricsRepo,
+		libraryRepo: settings.LibraryRepo,
+		detailRepo:  settings.DetailsRepo,
 	}
 }
 
+// GetLibrary retrieves a filtered list of songs from the database.
+//
+// It logs debug messages before and after retrieving the library, and error messages if an error occurs.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - filters: The filters to apply.
+//
+// Returns:
+//   - The filtered library with pagination data if successful.
+//   - An error if the operation fails or if no songs are found.
 func (c *Service) GetLibrary(
 	ctx context.Context,
 	filters models.Filters,
 ) (models.Library, error) {
-	return c.musicRepo.GetLibrary(ctx, filters)
+	return c.libraryRepo.GetLibrary(ctx, filters)
 }
 
+// GetSongLyrics retrieves the lyrics of a song from the database.
+//
+// It logs debug messages before and after retrieving the lyrics, and error messages if an error occurs.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - id: The ID of the song.
+//   - pagination: The pagination parameters.
+//
+// Returns:
+//   - The filtered lyrics with pagination data if successful.
+//   - An error if the operation fails or if the song is not found.
 func (c *Service) GetSongLyrics(
 	ctx context.Context,
 	id uuid.UUID,
 	pagination models.Pagination,
 ) (models.Lyrics, error) {
-	rawLyrics, err := c.musicRepo.GetSongLyrics(ctx, id)
+	rawLyrics, err := c.lyricsRepo.GetLyrics(ctx, id)
 	if err != nil {
 		return models.Lyrics{}, err
 	}
@@ -73,6 +105,17 @@ func (c *Service) GetSongLyrics(
 	}, nil
 }
 
+// AddSong adds a new song to the music library.
+//
+// It logs debug messages before and after retrieving the song details, and error messages if an error occurs.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - title: The title and band of the song to add.
+//
+// Returns:
+//   - The ID of the new song if successful.
+//   - An error if the operation fails or if the song is not found.
 func (c *Service) AddSong(ctx context.Context, title models.SongTitle) (uuid.UUID, error) {
 	details, err := c.detailRepo.GetSongDetails(ctx, title)
 	if err != nil {
@@ -84,7 +127,7 @@ func (c *Service) AddSong(ctx context.Context, title models.SongTitle) (uuid.UUI
 		SongDetail: details,
 	}
 
-	id, err := c.musicRepo.AddSong(ctx, song)
+	id, err := c.songsRepo.AddSong(ctx, song)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -92,10 +135,31 @@ func (c *Service) AddSong(ctx context.Context, title models.SongTitle) (uuid.UUI
 	return id, nil
 }
 
+// DeleteSong deletes a song with the given ID from the music library.
+//
+// It logs debug messages before and after deleting, and error messages if an error occurs during the process.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - id: The UUID of the song to be deleted.
+//
+// Returns:
+//   - An error if the operation fails, otherwise nil.
 func (c *Service) DeleteSong(ctx context.Context, id uuid.UUID) error {
-	return c.musicRepo.DeleteSong(ctx, id)
+	return c.songsRepo.DeleteSong(ctx, id)
 }
 
+// UpdateSong updates the details of an existing song in the library.
+//
+// It logs debug messages before and after updating, and error messages if an error occurs during the process.
+//
+// Parameters:
+//   - ctx: The context for managing cancellation.
+//   - song: The models.Song containing updated song details. Only non-empty fields
+//     will be updated in the database.
+//
+// Returns:
+//   - An error if the operation fails, or nil if the update is successful.
 func (c *Service) UpdateSong(ctx context.Context, song models.Song) error {
-	return c.musicRepo.UpdateSong(ctx, song)
+	return c.songsRepo.UpdateSong(ctx, song)
 }
