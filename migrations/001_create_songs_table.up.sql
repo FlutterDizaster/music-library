@@ -4,11 +4,11 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE IF NOT EXISTS songs (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title TEXT NOT NULL,
-    band TEXT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    band VARCHAR(255) NOT NULL,
     release_date DATE NOT NULL,
-    text TEXT NOT NULL,
-    link TEXT NOT NULL,
+    lyrics TEXT NOT NULL,
+    link VARCHAR(255) NOT NULL,
     deleted BOOLEAN DEFAULT false
 );
 

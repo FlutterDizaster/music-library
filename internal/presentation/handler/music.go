@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/FlutterDizaster/music-library/internal/apperrors"
+	"github.com/FlutterDizaster/music-library/internal/application/apperrors"
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
 	"github.com/FlutterDizaster/music-library/internal/domain/models"
 	"github.com/google/uuid"

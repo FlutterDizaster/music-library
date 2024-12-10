@@ -12,7 +12,7 @@ COPY . .
 RUN go build -ldflags="-s -w" -o music cmd/main.go
 
 # Deploy stage
-FROM alpine:latest
+FROM alpine:3.21
 
 RUN apk add --no-cache libc6-compat
 

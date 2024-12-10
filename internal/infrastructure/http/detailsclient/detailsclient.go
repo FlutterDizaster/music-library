@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FlutterDizaster/music-library/internal/apperrors"
+	"github.com/FlutterDizaster/music-library/internal/application/apperrors"
 	"github.com/FlutterDizaster/music-library/internal/domain/interfaces"
 	"github.com/FlutterDizaster/music-library/internal/domain/models"
 	"github.com/go-resty/resty/v2"
@@ -25,7 +25,7 @@ type DetailsClient struct {
 	client *resty.Client
 }
 
-var _ interfaces.DetailsRepository = (*DetailsClient)(nil)
+var _ interfaces.DetailsClient = (*DetailsClient)(nil)
 
 // New returns a new DetailsClient instance based on the provided settings.
 // It configures the Resty client with the provided settings, sets the retry count and

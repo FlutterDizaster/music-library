@@ -34,7 +34,7 @@ func New(ctx context.Context, settings config.Config) (Service, error) {
 	metricsRegistry := metrics.New("music-library")
 
 	slog.Debug("Application initialization", slog.String("stage", "connecting to database"))
-	songRepo, err := postgres.New(ctx, postgres.Settings{
+	musicRepo, err := postgres.New(ctx, postgres.Settings{
 		DatabaseDSN:  settings.DatabaseDSN,
 		RetryCount:   settings.DBRetryCount,
 		RetryBackoff: settings.DBRetryBackoff,
@@ -53,7 +53,9 @@ func New(ctx context.Context, settings config.Config) (Service, error) {
 
 	slog.Debug("Application initialization", slog.String("stage", "creating service"))
 	service := service.New(service.Settings{
-		MusicRepo:   songRepo,
+		SongsRepo:   musicRepo,
+		LyricsRepo:  musicRepo,
+		LibraryRepo: musicRepo,
 		DetailsRepo: detailsRepo,
 	})
 

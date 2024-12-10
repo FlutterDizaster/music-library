@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FlutterDizaster/music-library/internal/apperrors"
+	"github.com/FlutterDizaster/music-library/internal/application/apperrors"
 )
 
 type dateMode int
@@ -148,7 +148,7 @@ func (f Filters) ToQueryParams() (string, []any) {
 		counter++
 	}
 	if f.text != "" {
-		query += fmt.Sprintf(" AND text LIKE $%d", counter)
+		query += fmt.Sprintf(" AND lyrics LIKE $%d", counter)
 		values = append(values, f.text)
 		counter++
 	}
